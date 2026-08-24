@@ -3,19 +3,36 @@ package system
 import (
 	"bufio"
 	"os"
-	"runtime"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
 
-func getCommonInfo() ([]DataItem, error) {
-	items := make([]DataItem, 0)
+func getInfo() (info Info, err error) {
+	info.CpuInfo, err = getCpuInfo()
+	if err != nil {
+		return
+	}
+	info.RamInfo, err = getRamInfo()
+	if err != nil {
+		return
+	}
+	info.Drives, err = getDrives()
+	if err != nil {
+		return
+	}
+	info.GPUs, err = getGPUs()
+	if err != nil {
+		return
+	}
+	return
+}
 
-	items = append(items, DataItem{Name: "Cores", Value: strconv.Itoa(runtime.NumCPU())})
-
+func getCpuInfo() (CpuInfo, error) {
+	var info CpuInfo
 	f, err := os.Open("/proc/cpuinfo")
 	if err != nil {
-		return nil, err
+		return info, err
 	}
 	defer f.Close()
 
@@ -59,26 +76,30 @@ func getCommonInfo() ([]DataItem, error) {
 	cores = append(cores, &core)
 
 	if err := scanner.Err(); err != nil {
-		return nil, err
+		return info, err
 	}
 
-	for i, core := range cores {
-		items = append(items, DataItem{Name: "Core " + strconv.Itoa(i) + " Model Name", Value: core.ModelName})
+	cpuModels := make(map[string]struct{})
+	for _, core := range cores {
+		cpuModels[core.ModelName] = struct{}{}
 	}
 
-	memItems, err := getMemoryInfo()
-	if err != nil {
-		return nil, err
+	info.Cores = len(cores)
+	for model := range cpuModels {
+		if info.ModelStr != "" {
+			info.ModelStr += "; "
+		}
+		info.ModelStr += model
 	}
-	items = append(items, memItems...)
 
-	return items, nil
+	return info, nil
 }
 
-func getMemoryInfo() ([]DataItem, error) {
+func getRamInfo() (RamInfo, error) {
+	var info RamInfo
 	f, err := os.Open("/proc/meminfo")
 	if err != nil {
-		return nil, err
+		return info, err
 	}
 	defer f.Close()
 
@@ -116,15 +137,162 @@ func getMemoryInfo() ([]DataItem, error) {
 	}
 
 	if err := scanner.Err(); err != nil {
+		return info, err
+	}
+
+	info.Total = total
+	info.Used = total - available
+	info.Free = available
+
+	return info, nil
+}
+
+func readString(path string) string {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(data))
+}
+
+func readUint(path string) uint64 {
+	s := readString(path)
+	v, _ := strconv.ParseUint(s, 10, 64)
+	return v
+}
+
+func getDrives() ([]DriveInfo, error) {
+	entries, err := os.ReadDir("/sys/block")
+	if err != nil {
 		return nil, err
 	}
 
-	totalMemGBStr := strconv.FormatFloat(float64(total)/1024/1024/1024, 'f', 2, 64) + " GB"
-	availableMemGBStr := strconv.FormatFloat(float64(available)/1024/1024/1024, 'f', 2, 64) + " GB"
+	var result []DriveInfo
 
-	items := make([]DataItem, 0)
-	items = append(items, DataItem{Name: "Total Memory", Value: totalMemGBStr})
-	items = append(items, DataItem{Name: "Available Memory", Value: availableMemGBStr})
+	for _, entry := range entries {
+		name := entry.Name()
 
-	return items, nil
+		if strings.HasPrefix(name, "loop") ||
+			strings.HasPrefix(name, "ram") ||
+			strings.HasPrefix(name, "zram") {
+			continue
+		}
+
+		base := filepath.Join("/sys/block", name)
+
+		sectors := readUint(filepath.Join(base, "size")) // number of 512-byte sectors
+
+		var tp string
+		tp = "HDD"
+		if ok, _ := isSSD(name); ok {
+			tp = "SSD"
+		}
+
+		drive := DriveInfo{
+			Name:       name,
+			Model:      readString(filepath.Join(base, "device/model")),
+			Vendor:     readString(filepath.Join(base, "device/vendor")),
+			Size:       sectors * 512,
+			Removable:  readUint(filepath.Join(base, "removable")) != 0,
+			Rotational: readUint(filepath.Join(base, "queue/rotational")) != 0,
+			Type:       tp,
+		}
+
+		if isOpticalDrive(name) {
+			continue
+		}
+
+		result = append(result, drive)
+	}
+
+	return result, nil
+}
+
+func isOpticalDrive(name string) bool {
+	data, err := os.ReadFile("/sys/block/" + name + "/device/type")
+	if err != nil {
+		return false
+	}
+
+	return strings.TrimSpace(string(data)) == "5"
+}
+
+func isSSD(name string) (bool, error) {
+	data, err := os.ReadFile("/sys/block/" + name + "/queue/rotational")
+	if err != nil {
+		return false, err
+	}
+
+	return strings.TrimSpace(string(data)) == "0", nil
+}
+
+type GPU struct {
+	Name     string
+	VendorID uint16
+	DeviceID uint16
+	Driver   string
+}
+
+func readHex16(path string) uint16 {
+	s := readString(path)
+	s = strings.TrimPrefix(s, "0x")
+
+	v, err := strconv.ParseUint(s, 16, 16)
+	if err != nil {
+		return 0
+	}
+
+	return uint16(v)
+}
+
+func getGPUs() ([]GPUInfo, error) {
+	entries, err := os.ReadDir("/sys/class/drm")
+	if err != nil {
+		return nil, err
+	}
+
+	var result []GPUInfo
+
+	for _, entry := range entries {
+		name := entry.Name()
+
+		if !strings.HasPrefix(name, "card") {
+			continue
+		}
+
+		index := strings.TrimPrefix(name, "card")
+		if _, err := strconv.Atoi(index); err != nil {
+			continue
+		}
+
+		base := filepath.Join("/sys/class/drm", name, "device")
+
+		vendorPath := filepath.Join(base, "vendor")
+		devicePath := filepath.Join(base, "device")
+		if _, err := os.Stat(vendorPath); err != nil {
+			continue
+		}
+
+		gpu := GPUInfo{
+			Name:   name,
+			Vendor: readString(vendorPath),
+			Device: readString(devicePath),
+		}
+
+		driverLink := filepath.Join(base, "driver")
+		if path, err := filepath.EvalSymlinks(driverLink); err == nil {
+			gpu.Driver = filepath.Base(path)
+		}
+
+		model, ok := PCIName(readHex16(vendorPath), readHex16(devicePath))
+		if ok {
+			gpu.Model = model
+		} else {
+			gpu.Model = "Unknown" + " (" + gpu.Vendor + ":" + gpu.Device + ")"
+		}
+
+		result = append(result, gpu)
+	}
+
+	return result, nil
 }

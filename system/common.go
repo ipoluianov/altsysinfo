@@ -1,5 +1,5 @@
 package system
 
-func GetCommonInfo() ([]DataItem, error) {
-	return getCommonInfo()
+func GetInfo() (Info, error) {
+	return getInfo()
 }

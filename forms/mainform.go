@@ -17,7 +17,7 @@ func NewMainForm() *MainForm {
 	var c MainForm
 	c.InitWidget()
 	c.topWidget = NewTopWidget()
-	c.leftWidget = NewLeftWidget()
+	c.leftWidget = NewLeftWidget(c.SetMode)
 	c.centerWidget = NewCenterWidget()
 	c.bottomWidget = NewBottomWidget()
 
@@ -28,4 +28,8 @@ func NewMainForm() *MainForm {
 	c.AddWidgetOnGrid(c.panelCenter, 1, 0)
 	c.AddWidgetOnGrid(c.bottomWidget, 2, 0)
 	return &c
+}
+
+func (c *MainForm) SetMode(mode string) {
+	c.centerWidget.SetMode(mode)
 }

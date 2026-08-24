@@ -1,4 +1,4 @@
-module github.com/ipoluianov/alsysinfo
+module github.com/ipoluianov/altsysinfo
 
 go 1.25.5
 
