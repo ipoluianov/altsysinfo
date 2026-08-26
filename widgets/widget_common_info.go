@@ -29,27 +29,30 @@ func NewWidgetCommonInfo() *WidgetCommonInfo {
 	return &c
 }
 
+func (c *WidgetCommonInfo) AddRow(name, value string) {
+	row := c.lvItems.RowCount()
+	c.lvItems.SetRowCount(row + 1)
+	c.lvItems.SetCellText2(row, 0, name)
+	c.lvItems.SetCellText2(row, 1, value)
+}
+
 func (c *WidgetCommonInfo) LoadCommonInfo() {
 	info, err := system.GetInfo()
 	if err != nil {
 		return
 	}
 
-	c.lvItems.SetRowCount(1 + 1 + len(info.Drives) + len(info.GPUs))
+	c.lvItems.SetRowCount(0)
+	c.AddRow("CPU Model", info.CpuInfo.ModelStr)
+	c.AddRow("CPU Cores", strconv.FormatInt(int64(info.CpuInfo.Cores), 10))
 
-	c.lvItems.SetCellText2(0, 0, "CPU")
-	c.lvItems.SetCellText2(0, 1, strconv.FormatInt(int64(info.CpuInfo.Cores), 10)+" x "+info.CpuInfo.ModelStr)
-
-	c.lvItems.SetCellText2(1, 0, "RAM")
-	c.lvItems.SetCellText2(1, 1, strconv.FormatUint(info.RamInfo.Total/1024/1024, 10)+" MB")
+	c.AddRow("RAM", strconv.FormatUint(info.RamInfo.Total/1024/1024, 10)+" MB")
 
 	for i, drive := range info.Drives {
-		c.lvItems.SetCellText2(2+i, 0, "Drive")
-		c.lvItems.SetCellText2(2+i, 1, drive.Model+" ("+drive.Type+") - "+strconv.FormatUint(drive.Size/1024/1024/1024, 10)+" GB")
+		c.AddRow("Drive "+strconv.Itoa(i+1), drive.Model+" ("+drive.Type+") - "+strconv.FormatUint(drive.Size/1024/1024/1024, 10)+" GB")
 	}
 
 	for i, gpu := range info.GPUs {
-		c.lvItems.SetCellText2(2+len(info.Drives)+i, 0, "GPU")
-		c.lvItems.SetCellText2(2+len(info.Drives)+i, 1, gpu.Model+" ("+gpu.Vendor+":"+gpu.Device+") - Driver: "+gpu.Driver)
+		c.AddRow("GPU "+strconv.Itoa(i+1), gpu.Model+" ("+gpu.Vendor+":"+gpu.Device+") - Driver: "+gpu.Driver)
 	}
 }
