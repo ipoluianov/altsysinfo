@@ -1,6 +1,7 @@
 package system
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 	"strconv"
@@ -25,6 +26,10 @@ func getInfo() (info Info, err error) {
 		return
 	}
 	info.GPUs, err = getGPUs()
+	if err != nil {
+		return
+	}
+	info.RamDevices, err = getMemoryModules()
 	if err != nil {
 		return
 	}
@@ -258,4 +263,40 @@ func parsePCIID(pnpDeviceID string) (vendorID, deviceID string) {
 	}
 
 	return
+}
+
+func getMemoryModules() ([]RamDeviceInfo, error) {
+	type Win32_PhysicalMemory struct {
+		BankLabel            string
+		DeviceLocator        string
+		Manufacturer         string
+		PartNumber           string
+		SerialNumber         string
+		Capacity             uint64
+		Speed                uint32
+		ConfiguredClockSpeed uint32
+		MemoryType           uint16
+		SMBIOSMemoryType     uint32
+		FormFactor           uint16
+	}
+
+	var dst []Win32_PhysicalMemory
+
+	query := wmi.CreateQuery(&dst, "")
+	err := wmi.Query(query, &dst)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	result := make([]RamDeviceInfo, 0, len(dst))
+	for _, mem := range dst {
+		result = append(result, RamDeviceInfo{
+			Model: mem.PartNumber,
+			Size:  mem.Capacity,
+			Speed: uint64(mem.ConfiguredClockSpeed),
+		})
+	}
+
+	return result, nil
 }

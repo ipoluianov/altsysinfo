@@ -1,10 +1,11 @@
 package system
 
 type Info struct {
-	CpuInfo CpuInfo
-	RamInfo RamInfo
-	Drives  []DriveInfo
-	GPUs    []GPUInfo
+	CpuInfo    CpuInfo
+	RamInfo    RamInfo
+	RamDevices []RamDeviceInfo
+	Drives     []DriveInfo
+	GPUs       []GPUInfo
 }
 
 type CpuInfo struct {
@@ -34,4 +35,10 @@ type GPUInfo struct {
 	Device string
 	Driver string
 	Model  string
+}
+
+type RamDeviceInfo struct {
+	Model string
+	Size  uint64
+	Speed uint64
 }
