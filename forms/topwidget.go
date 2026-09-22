@@ -10,6 +10,6 @@ func NewTopWidget() *TopWidget {
 	var c TopWidget
 	c.InitWidget()
 
-	c.AddWidgetOnGrid(ui.NewLabel("TOP"), 0, 0)
+	c.AddWidget(0, 0, ui.NewLabel("TOP"))
 	return &c
 }

@@ -10,6 +10,7 @@ func main() {
 	form.SetTitle("SysInfo")
 	form.SetSize(1100, 800)
 	mainForm := forms.NewMainForm()
-	form.Panel().AddWidgetOnGrid(mainForm, 0, 0)
+	form.Panel().AddWidget(0, 0, mainForm)
+	form.Show()
 	form.Exec()
 }

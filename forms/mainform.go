@@ -21,12 +21,12 @@ func NewMainForm() *MainForm {
 	c.centerWidget = NewCenterWidget()
 	c.bottomWidget = NewBottomWidget()
 
-	c.AddWidgetOnGrid(c.topWidget, 0, 0)
+	c.AddWidget(0, 0, c.topWidget)
 	c.panelCenter = ui.NewPanel()
-	c.panelCenter.AddWidgetOnGrid(c.leftWidget, 0, 0)
-	c.panelCenter.AddWidgetOnGrid(c.centerWidget, 0, 1)
-	c.AddWidgetOnGrid(c.panelCenter, 1, 0)
-	c.AddWidgetOnGrid(c.bottomWidget, 2, 0)
+	c.panelCenter.AddWidget(0, 0, c.leftWidget)
+	c.panelCenter.AddWidget(0, 1, c.centerWidget)
+	c.AddWidget(1, 0, c.panelCenter)
+	c.AddWidget(2, 0, c.bottomWidget)
 	return &c
 }
 

@@ -17,8 +17,8 @@ func NewWidgetCommonInfo() *WidgetCommonInfo {
 	var c WidgetCommonInfo
 	c.InitWidget()
 	c.lvItems = ui.NewTable()
-	c.AddWidgetOnGrid(c.lvItems, 0, 0)
-	c.lvItems.SetSelectingCell(false)
+	c.AddWidget(0, 0, c.lvItems)
+	c.lvItems.SetSelectingRows(true)
 	c.lvItems.SetColumnCount(2)
 	c.lvItems.SetColumnWidth(0, 200)
 	c.lvItems.SetColumnWidth(1, 600)

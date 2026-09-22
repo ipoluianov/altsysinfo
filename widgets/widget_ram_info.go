@@ -17,8 +17,8 @@ func NewWidgetRamInfo() *WidgetRamInfo {
 	var c WidgetRamInfo
 	c.InitWidget()
 	c.lvItems = ui.NewTable()
-	c.AddWidgetOnGrid(c.lvItems, 0, 0)
-	c.lvItems.SetSelectingCell(false)
+	c.AddWidget(0, 0, c.lvItems)
+	c.lvItems.SetSelectingRows(true)
 
 	c.lvItems.SetColumnCount(3)
 	c.lvItems.SetColumnWidth(0, 300)

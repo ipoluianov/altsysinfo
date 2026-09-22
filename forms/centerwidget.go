@@ -22,7 +22,7 @@ func NewCenterWidget() *CenterWidget {
 
 func (c *CenterWidget) SetWidget(w ui.Widgeter) {
 	c.RemoveAllWidgets()
-	c.AddWidgetOnGrid(w, 0, 0)
+	c.AddWidget(0, 0, w)
 }
 
 func (c *CenterWidget) SetMode(mode string) {

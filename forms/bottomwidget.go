@@ -9,8 +9,8 @@ type BottomWidget struct {
 func NewBottomWidget() *BottomWidget {
 	var c BottomWidget
 	c.InitWidget()
-	c.AddWidgetOnGrid(ui.NewLabel("Bottom"), 0, 0)
-	c.AddWidgetOnGrid(ui.NewHSpacer(), 0, 1)
-	c.AddWidgetOnGrid(ui.NewLabel("AltBins"), 0, 2)
+	c.AddWidget(0, 0, ui.NewLabel("Bottom"))
+	c.AddWidget(0, 1, ui.NewHSpacer())
+	c.AddWidget(0, 2, ui.NewLabel("AltBins"))
 	return &c
 }

@@ -24,31 +24,31 @@ func NewWidgetPciDevInfo() *WidgetPciDevInfo {
 	c.InitWidget()
 	c.panelFilter = ui.NewPanel()
 
-	c.panelFilter.AddWidgetOnGrid(ui.NewLabel("VEN"), 0, 0)
+	c.panelFilter.AddWidget(0, 0, ui.NewLabel("VEN"))
 	c.txtVendor = ui.NewTextBox()
 	c.txtVendor.SetHint("Vendor ID")
 	c.txtVendor.SetMinWidth(100)
 	c.txtVendor.SetXExpandable(false)
-	c.panelFilter.AddWidgetOnGrid(c.txtVendor, 1, 0)
+	c.panelFilter.AddWidget(1, 0, c.txtVendor)
 
-	c.panelFilter.AddWidgetOnGrid(ui.NewLabel("DEV"), 0, 1)
+	c.panelFilter.AddWidget(0, 1, ui.NewLabel("DEV"))
 	c.txtDevice = ui.NewTextBox()
 	c.txtDevice.SetHint("Device ID")
 	c.txtDevice.SetMinWidth(100)
 	c.txtDevice.SetXExpandable(false)
-	c.panelFilter.AddWidgetOnGrid(c.txtDevice, 1, 1)
+	c.panelFilter.AddWidget(1, 1, c.txtDevice)
 
-	c.panelFilter.AddWidgetOnGrid(ui.NewLabel("Vendor/Device Name"), 0, 2)
+	c.panelFilter.AddWidget(0, 2, ui.NewLabel("Vendor/Device Name"))
 	c.txtName = ui.NewTextBox()
 	c.txtName.SetHint("Vendor/Device Name")
 	c.txtName.SetMinWidth(100)
 	c.txtName.SetXExpandable(true)
-	c.panelFilter.AddWidgetOnGrid(c.txtName, 1, 2)
+	c.panelFilter.AddWidget(1, 2, c.txtName)
 
 	c.panelFilter.SetXExpandable(true)
 	c.panelFilter.SetYExpandable(false)
 
-	c.panelFilter.AddWidgetOnGrid(ui.NewHSpacer(), 0, 2)
+	c.panelFilter.AddWidget(0, 2, ui.NewHSpacer())
 
 	c.txtDevice.SetOnTextChanged(func() {
 		c.LoadPciDevInfo()
@@ -61,12 +61,12 @@ func NewWidgetPciDevInfo() *WidgetPciDevInfo {
 	})
 
 	c.lvItems = ui.NewTable()
-	c.AddWidgetOnGrid(c.panelFilter, 0, 0)
-	c.AddWidgetOnGrid(c.lvItems, 1, 0)
+	c.AddWidget(0, 0, c.panelFilter)
+	c.AddWidget(1, 0, c.lvItems)
 	c.SetXExpandable(true)
 	c.SetYExpandable(true)
 
-	c.lvItems.SetSelectingCell(false)
+	c.lvItems.SetSelectingRows(true)
 
 	c.lvItems.SetRowCount(10)
 	c.lvItems.SetColumnCount(4)
