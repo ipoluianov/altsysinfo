@@ -2,6 +2,7 @@ package system
 
 import (
 	"bufio"
+	"encoding/binary"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -25,6 +26,7 @@ func getInfo() (info Info, err error) {
 	if err != nil {
 		return
 	}
+	info.RamDevices = getMemoryModules()
 	return
 }
 
@@ -295,4 +297,156 @@ func getGPUs() ([]GPUInfo, error) {
 	}
 
 	return result, nil
+}
+
+// getMemoryModules returns installed memory modules (SMBIOS type 17).
+// The udev database is readable without root; the raw SMBIOS table
+// is used as a fallback (requires root).
+func getMemoryModules() []RamDeviceInfo {
+	if modules := getMemoryModulesUdev(); len(modules) > 0 {
+		return modules
+	}
+	return getMemoryModulesSMBIOS()
+}
+
+func getMemoryModulesUdev() []RamDeviceInfo {
+	f, err := os.Open("/run/udev/data/+dmi:id")
+	if err != nil {
+		return nil
+	}
+	defer f.Close()
+
+	devices := make(map[int]map[string]string)
+	maxIndex := -1
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line, ok := strings.CutPrefix(scanner.Text(), "E:MEMORY_DEVICE_")
+		if !ok {
+			continue
+		}
+		key, value, ok := strings.Cut(line, "=")
+		if !ok {
+			continue
+		}
+		indexStr, field, ok := strings.Cut(key, "_")
+		if !ok {
+			continue
+		}
+		index, err := strconv.Atoi(indexStr)
+		if err != nil {
+			continue
+		}
+		if devices[index] == nil {
+			devices[index] = make(map[string]string)
+		}
+		devices[index][field] = value
+		maxIndex = max(maxIndex, index)
+	}
+
+	var result []RamDeviceInfo
+	for i := 0; i <= maxIndex; i++ {
+		dev := devices[i]
+		if dev == nil || dev["PRESENT"] == "0" {
+			continue
+		}
+		size, _ := strconv.ParseUint(dev["SIZE"], 10, 64)
+		if size == 0 {
+			continue
+		}
+		speed, _ := strconv.ParseUint(dev["CONFIGURED_SPEED_MTS"], 10, 64)
+		if speed == 0 {
+			speed, _ = strconv.ParseUint(dev["SPEED_MTS"], 10, 64)
+		}
+		result = append(result, RamDeviceInfo{
+			Model: dev["PART_NUMBER"],
+			Size:  size,
+			Speed: speed,
+		})
+	}
+	return result
+}
+
+func getMemoryModulesSMBIOS() []RamDeviceInfo {
+	data, err := os.ReadFile("/sys/firmware/dmi/tables/DMI")
+	if err != nil {
+		return nil
+	}
+
+	var result []RamDeviceInfo
+
+	for len(data) >= 4 {
+		structType := data[0]
+		length := int(data[1])
+		if length < 4 || length > len(data) {
+			break
+		}
+		formatted := data[:length]
+
+		// Strings follow the formatted area and end with a double null
+		end := length
+		for end+1 < len(data) && (data[end] != 0 || data[end+1] != 0) {
+			end++
+		}
+		strs := strings.Split(string(data[length:end]), "\x00")
+		data = data[min(end+2, len(data)):]
+
+		if structType == 127 { // end of table
+			break
+		}
+		if structType != 17 || length < 0x1B {
+			continue
+		}
+
+		getString := func(offset int) string {
+			idx := int(formatted[offset])
+			if idx == 0 || idx > len(strs) {
+				return ""
+			}
+			return strings.TrimSpace(strs[idx-1])
+		}
+		word := func(offset int) uint64 {
+			if offset+2 > length {
+				return 0
+			}
+			return uint64(binary.LittleEndian.Uint16(formatted[offset:]))
+		}
+		dword := func(offset int) uint64 {
+			if offset+4 > length {
+				return 0
+			}
+			return uint64(binary.LittleEndian.Uint32(formatted[offset:]))
+		}
+
+		var size uint64
+		switch rawSize := word(0x0C); {
+		case rawSize == 0 || rawSize == 0xFFFF: // not installed / unknown
+			continue
+		case rawSize == 0x7FFF:
+			size = (dword(0x1C) & 0x7FFFFFFF) * 1024 * 1024
+		case rawSize&0x8000 != 0:
+			size = (rawSize & 0x7FFF) * 1024
+		default:
+			size = rawSize * 1024 * 1024
+		}
+
+		speed := word(0x20)
+		if speed == 0xFFFF {
+			speed = dword(0x58)
+		}
+		if speed == 0 {
+			speed = word(0x15)
+			if speed == 0xFFFF {
+				speed = dword(0x54)
+			}
+		}
+
+		result = append(result, RamDeviceInfo{
+			Model: getString(0x1A),
+			Size:  size,
+			Speed: speed,
+		})
+	}
+
+	return result
 }

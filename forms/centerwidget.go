@@ -1,6 +1,7 @@
 package forms
 
 import (
+	"github.com/ipoluianov/altsysinfo/system"
 	"github.com/ipoluianov/altsysinfo/widgets"
 	"github.com/u00io/nuiforms/ui"
 )
@@ -36,5 +37,12 @@ func (c *CenterWidget) SetMode(mode string) {
 	case "pcidev":
 		w := widgets.NewWidgetPciDevInfo()
 		c.SetWidget(w)
+	default:
+		for _, category := range system.DetailCategories() {
+			if category.ID == mode {
+				c.SetWidget(widgets.NewWidgetDetails(category))
+				break
+			}
+		}
 	}
 }
