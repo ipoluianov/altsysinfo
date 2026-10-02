@@ -27,6 +27,7 @@ func NewWidgetCommonInfo(info system.Info) *WidgetCommonInfo {
 	c.lvItems.SetColumnName(1, texts.T().ColValue)
 
 	c.LoadCommonInfo(info)
+	AddCopyButtons(c.lvItems, 1)
 	return &c
 }
 

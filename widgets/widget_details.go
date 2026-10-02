@@ -64,6 +64,11 @@ func newDetailTableView(t *system.DetailTable) *ui.Table {
 		}
 	}
 
+	// Name/value tables: the values can be copied
+	if len(t.Columns) == 2 && t.Columns[1] == "Value" && len(t.Rows) > 0 {
+		AddCopyButtons(tv, 1)
+	}
+
 	// Size columns by content: about 10 px per character
 	for col, name := range t.Columns {
 		width := utf8.RuneCountInString(name)

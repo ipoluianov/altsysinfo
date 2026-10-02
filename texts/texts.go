@@ -39,13 +39,15 @@ type Strings struct {
 	// The filter of the PCI vendors and devices
 	VendorDeviceName string
 	// Rows of the common information
-	CPUModel   string
-	CPUCores   string
-	Drive      func(n int) string
-	GPU        func(n int) string
-	Driver     string
-	NoData     string
-	Loading    string
+	CPUModel string
+	CPUCores string
+	Drive    func(n int) string
+	GPU      func(n int) string
+	Driver   string
+	NoData   string
+	Loading  string
+	// A toast after a value is copied to the clipboard
+	Copied     string
 	CannotLoad func(err string) string
 
 	// PDF report
