@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/ipoluianov/altsysinfo/system"
+	"github.com/ipoluianov/altsysinfo/texts"
 	"github.com/ipoluianov/nui/ui"
 )
 
@@ -26,21 +27,21 @@ func NewWidgetPciDevInfo() *WidgetPciDevInfo {
 
 	c.panelFilter.AddWidget(0, 0, ui.NewLabel("VEN"))
 	c.txtVendor = ui.NewTextBox()
-	c.txtVendor.SetHint("Vendor ID")
+	c.txtVendor.SetHint(texts.T().ColVendorID)
 	c.txtVendor.SetMinWidth(100)
 	c.txtVendor.SetXExpandable(false)
 	c.panelFilter.AddWidget(1, 0, c.txtVendor)
 
 	c.panelFilter.AddWidget(0, 1, ui.NewLabel("DEV"))
 	c.txtDevice = ui.NewTextBox()
-	c.txtDevice.SetHint("Device ID")
+	c.txtDevice.SetHint(texts.T().ColDeviceID)
 	c.txtDevice.SetMinWidth(100)
 	c.txtDevice.SetXExpandable(false)
 	c.panelFilter.AddWidget(1, 1, c.txtDevice)
 
-	c.panelFilter.AddWidget(0, 2, ui.NewLabel("Vendor/Device Name"))
+	c.panelFilter.AddWidget(0, 2, ui.NewLabel(texts.T().VendorDeviceName))
 	c.txtName = ui.NewTextBox()
-	c.txtName.SetHint("Vendor/Device Name")
+	c.txtName.SetHint(texts.T().VendorDeviceName)
 	c.txtName.SetMinWidth(100)
 	c.txtName.SetXExpandable(true)
 	c.panelFilter.AddWidget(1, 2, c.txtName)
@@ -60,13 +61,11 @@ func NewWidgetPciDevInfo() *WidgetPciDevInfo {
 		c.LoadPciDevInfo()
 	})
 
-	c.lvItems = ui.NewTable()
+	c.lvItems = NewTable()
 	c.AddWidget(0, 0, c.panelFilter)
 	c.AddWidget(1, 0, c.lvItems)
 	c.SetXExpandable(true)
 	c.SetYExpandable(true)
-
-	c.lvItems.SetSelectingRows(true)
 
 	c.lvItems.SetRowCount(10)
 	c.lvItems.SetColumnCount(4)
@@ -75,10 +74,10 @@ func NewWidgetPciDevInfo() *WidgetPciDevInfo {
 	c.lvItems.SetColumnWidth(2, 300)
 	c.lvItems.SetColumnWidth(3, 600)
 	c.lvItems.SetAllowScroll(false, true)
-	c.lvItems.SetColumnName(0, "Vendor ID")
-	c.lvItems.SetColumnName(1, "Device ID")
-	c.lvItems.SetColumnName(2, "Vendor Name")
-	c.lvItems.SetColumnName(3, "Device Name")
+	c.lvItems.SetColumnName(0, texts.T().ColVendorID)
+	c.lvItems.SetColumnName(1, texts.T().ColDeviceID)
+	c.lvItems.SetColumnName(2, texts.T().ColVendorName)
+	c.lvItems.SetColumnName(3, texts.T().ColDeviceName)
 
 	c.LoadPciDevInfo()
 	return &c

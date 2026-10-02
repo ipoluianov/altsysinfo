@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/ipoluianov/altsysinfo/system"
+	"github.com/ipoluianov/altsysinfo/texts"
 	"github.com/ipoluianov/nui/ui"
 )
 
@@ -13,19 +14,19 @@ type WidgetCommonInfo struct {
 	lvItems *ui.Table
 }
 
-func NewWidgetCommonInfo() *WidgetCommonInfo {
+// NewWidgetCommonInfo shows the main facts of the system.GetInfo result
+func NewWidgetCommonInfo(info system.Info) *WidgetCommonInfo {
 	var c WidgetCommonInfo
 	c.InitWidget()
-	c.lvItems = ui.NewTable()
+	c.lvItems = NewTable()
 	c.AddWidget(0, 0, c.lvItems)
-	c.lvItems.SetSelectingRows(true)
 	c.lvItems.SetColumnCount(2)
 	c.lvItems.SetColumnWidth(0, 200)
 	c.lvItems.SetColumnWidth(1, 600)
-	c.lvItems.SetColumnName(0, "Name")
-	c.lvItems.SetColumnName(1, "Value")
+	c.lvItems.SetColumnName(0, texts.T().ColName)
+	c.lvItems.SetColumnName(1, texts.T().ColValue)
 
-	c.LoadCommonInfo()
+	c.LoadCommonInfo(info)
 	return &c
 }
 
@@ -36,23 +37,20 @@ func (c *WidgetCommonInfo) AddRow(name, value string) {
 	c.lvItems.SetCellText2(row, 1, value)
 }
 
-func (c *WidgetCommonInfo) LoadCommonInfo() {
-	info, err := system.GetInfo()
-	if err != nil {
-		return
-	}
+func (c *WidgetCommonInfo) LoadCommonInfo(info system.Info) {
+	t := texts.T()
 
 	c.lvItems.SetRowCount(0)
-	c.AddRow("CPU Model", info.CpuInfo.ModelStr)
-	c.AddRow("CPU Cores", strconv.FormatInt(int64(info.CpuInfo.Cores), 10))
+	c.AddRow(t.CPUModel, info.CpuInfo.ModelStr)
+	c.AddRow(t.CPUCores, strconv.FormatInt(int64(info.CpuInfo.Cores), 10))
 
-	c.AddRow("RAM", strconv.FormatUint(info.RamInfo.Total/1024/1024, 10)+" MB")
+	c.AddRow(t.Category.RAM, strconv.FormatUint(info.RamInfo.Total/1024/1024, 10)+" MB")
 
 	for i, drive := range info.Drives {
-		c.AddRow("Drive "+strconv.Itoa(i+1), drive.Model+" ("+drive.Type+") - "+strconv.FormatUint(drive.Size/1024/1024/1024, 10)+" GB")
+		c.AddRow(t.Drive(i+1), drive.Model+" ("+drive.Type+") - "+strconv.FormatUint(drive.Size/1024/1024/1024, 10)+" GB")
 	}
 
 	for i, gpu := range info.GPUs {
-		c.AddRow("GPU "+strconv.Itoa(i+1), gpu.Model+" ("+gpu.Vendor+":"+gpu.Device+") - Driver: "+gpu.Driver)
+		c.AddRow(t.GPU(i+1), gpu.Model+" ("+gpu.Vendor+":"+gpu.Device+") - "+t.Driver+": "+gpu.Driver)
 	}
 }

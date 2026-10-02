@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=AltSysInfo
+Comment=Hardware and system information viewer
+Exec=altsysinfo
+Icon=altsysinfo
+Terminal=false
+Categories=System;Utility;
+StartupNotify=false

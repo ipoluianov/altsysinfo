@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/ipoluianov/altsysinfo/system"
+	"github.com/ipoluianov/altsysinfo/texts"
 	"github.com/ipoluianov/nui/ui"
 )
 
@@ -13,30 +14,26 @@ type WidgetRamInfo struct {
 	lvItems *ui.Table
 }
 
-func NewWidgetRamInfo() *WidgetRamInfo {
+// NewWidgetRamInfo shows the memory modules of the system.GetInfo result
+func NewWidgetRamInfo(info system.Info) *WidgetRamInfo {
 	var c WidgetRamInfo
 	c.InitWidget()
-	c.lvItems = ui.NewTable()
+	c.lvItems = NewTable()
 	c.AddWidget(0, 0, c.lvItems)
-	c.lvItems.SetSelectingRows(true)
 
 	c.lvItems.SetColumnCount(3)
 	c.lvItems.SetColumnWidth(0, 300)
 	c.lvItems.SetColumnWidth(1, 200)
 	c.lvItems.SetColumnWidth(2, 200)
-	c.lvItems.SetColumnName(0, "Model")
-	c.lvItems.SetColumnName(1, "Size")
-	c.lvItems.SetColumnName(2, "Speed")
+	c.lvItems.SetColumnName(0, texts.T().ColModel)
+	c.lvItems.SetColumnName(1, texts.T().ColSize)
+	c.lvItems.SetColumnName(2, texts.T().ColSpeed)
 
-	c.LoadRamInfo()
+	c.LoadRamInfo(info)
 	return &c
 }
 
-func (c *WidgetRamInfo) LoadRamInfo() {
-	info, err := system.GetInfo()
-	if err != nil {
-		return
-	}
+func (c *WidgetRamInfo) LoadRamInfo(info system.Info) {
 
 	c.lvItems.SetRowCount(0)
 	for i, ram := range info.RamDevices {

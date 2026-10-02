@@ -1,30 +1,26 @@
 package widgets
 
 import (
-	"image/color"
 	"unicode/utf8"
 
 	"github.com/ipoluianov/altsysinfo/system"
+	"github.com/ipoluianov/altsysinfo/texts"
 	"github.com/ipoluianov/nui/ui"
 )
 
-// sectionColor is the text color of section header rows.
-var sectionColor = color.RGBA{R: 0x3a, G: 0x8e, B: 0xe6, A: 0xff}
-
-// WidgetDetails shows the tables of a details category.
+// WidgetDetails shows the tables of a details category, loaded by DetailCategory.Load
 type WidgetDetails struct {
 	ui.Widget
 }
 
-func NewWidgetDetails(category system.DetailCategory) *WidgetDetails {
+func NewWidgetDetails(tables []*system.DetailTable, err error) *WidgetDetails {
 	var c WidgetDetails
 	c.InitWidget()
 	c.SetXExpandable(true)
 	c.SetYExpandable(true)
 
-	tables, err := category.Load()
 	if err != nil {
-		c.AddWidget(0, 0, ui.NewLabel("Cannot load information: "+err.Error()))
+		c.AddWidget(0, 0, ui.NewLabel(texts.T().CannotLoad(err.Error())))
 		c.AddWidget(1, 0, ui.NewVSpacer())
 		return &c
 	}
@@ -44,17 +40,16 @@ func NewWidgetDetails(category system.DetailCategory) *WidgetDetails {
 }
 
 func newDetailTableView(t *system.DetailTable) *ui.Table {
-	tv := ui.NewTable()
-	tv.SetSelectingRows(true)
+	tv := NewTable()
 	tv.SetColumnCount(len(t.Columns))
 	for i, name := range t.Columns {
-		tv.SetColumnName(i, name)
+		tv.SetColumnName(i, texts.T().Column(name))
 	}
 
 	if len(t.Rows) == 0 {
 		tv.SetRowCount(1)
-		tv.SetCellText2(0, 0, "No data available")
-		tv.SetCellColor(0, 0, color.RGBA{R: 0x80, G: 0x80, B: 0x80, A: 0xff})
+		tv.SetCellText2(0, 0, texts.T().NoData)
+		tv.SetCellColor(0, 0, ColorMuted.Get())
 	} else {
 		tv.SetRowCount(len(t.Rows))
 		for r, cells := range t.Rows {
@@ -64,7 +59,7 @@ func newDetailTableView(t *system.DetailTable) *ui.Table {
 				}
 			}
 			if len(cells) == 1 {
-				tv.SetCellColor(r, 0, sectionColor)
+				tv.SetCellColor(r, 0, ColorSection.Get())
 			}
 		}
 	}

@@ -1,0 +1,34 @@
+# nfpm config for the .deb and .rpm packages, used by _build.sh/_build.bat.
+# Paths are relative to the repo root; ${...} comes from the environment.
+# nfpm does not expand variables in src, so the binary is staged in bin/.pkg/.
+name: altsysinfo
+arch: ${PKG_ARCH}
+platform: linux
+version: ${PKG_VERSION}
+section: utils
+priority: optional
+maintainer: Ivan Poluianov <ipoluyanov@gmail.com>
+description: AltSysInfo - hardware and system information viewer.
+homepage: https://github.com/ipoluianov/altsysinfo
+license: MIT
+
+contents:
+  - src: bin/.pkg/altsysinfo
+    dst: /usr/bin/altsysinfo
+    file_info:
+      mode: 0755
+  - src: build/altsysinfo.desktop
+    dst: /usr/share/applications/altsysinfo.desktop
+  - src: icon.svg
+    dst: /usr/share/icons/hicolor/scalable/apps/altsysinfo.svg
+  - src: icon.png
+    dst: /usr/share/icons/hicolor/256x256/apps/altsysinfo.png
+
+# nui loads these with dlopen at runtime; only libX11 is mandatory
+overrides:
+  deb:
+    depends: [libx11-6]
+    recommends: [libxext6, libxinerama1, libfreetype6]
+  rpm:
+    depends: [libX11]
+    recommends: [libXext, libXinerama, freetype]
