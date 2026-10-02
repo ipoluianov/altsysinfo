@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/ipoluianov/altsysinfo/system"
-	"github.com/u00io/nuiforms/ui"
+	"github.com/ipoluianov/nui/ui"
 )
 
 type WidgetCommonInfo struct {

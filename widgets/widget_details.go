@@ -5,7 +5,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/ipoluianov/altsysinfo/system"
-	"github.com/u00io/nuiforms/ui"
+	"github.com/ipoluianov/nui/ui"
 )
 
 // sectionColor is the text color of section header rows.

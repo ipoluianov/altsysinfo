@@ -1,6 +1,6 @@
 package forms
 
-import "github.com/u00io/nuiforms/ui"
+import "github.com/ipoluianov/nui/ui"
 
 type MainForm struct {
 	ui.Widget

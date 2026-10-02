@@ -3,7 +3,7 @@ package forms
 import (
 	"github.com/ipoluianov/altsysinfo/system"
 	"github.com/ipoluianov/altsysinfo/widgets"
-	"github.com/u00io/nuiforms/ui"
+	"github.com/ipoluianov/nui/ui"
 )
 
 type CenterWidget struct {

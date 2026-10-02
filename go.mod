@@ -1,13 +1,12 @@
 module github.com/ipoluianov/altsysinfo
 
-go 1.25.5
+go 1.27.1
 
 require (
 	github.com/StackExchange/wmi v1.2.1
 	github.com/go-pdf/fpdf v0.9.0
+	github.com/ipoluianov/nui v0.0.8
 	github.com/shirou/gopsutil/v4 v4.26.7
-	github.com/u00io/nui v0.0.32
-	github.com/u00io/nuiforms v0.0.55
 	golang.org/x/sys v0.41.0
 )
 
@@ -15,6 +14,7 @@ require (
 	github.com/ebitengine/purego v0.10.2 // indirect
 	github.com/fogleman/gg v1.3.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
+	github.com/godbus/dbus/v5 v5.2.2 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect

@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/ipoluianov/altsysinfo/forms"
-	"github.com/u00io/nuiforms/ui"
+	"github.com/ipoluianov/nui/ui"
 )
 
 func main() {

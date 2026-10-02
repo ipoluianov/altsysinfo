@@ -6,8 +6,7 @@ import (
 
 	"github.com/ipoluianov/altsysinfo/report"
 	"github.com/ipoluianov/altsysinfo/system"
-	"github.com/u00io/nui/nui"
-	"github.com/u00io/nuiforms/ui"
+	"github.com/ipoluianov/nui/ui"
 )
 
 type TopWidget struct {
@@ -38,24 +37,26 @@ func (c *TopWidget) savePdfReport() {
 		return
 	}
 
-	path, err := nui.SaveFileDialog(nil, nui.SaveFileDialogOptions{
+	opts := ui.SaveFileDialogOptions{
 		Title:           "Save PDF report",
 		DefaultFileName: "sysinfo-report-" + time.Now().Format("2006-01-02") + ".pdf",
-		Filters: []nui.FileDialogFilter{
+		Filters: []ui.FileDialogFilter{
 			{DisplayName: "PDF files", Patterns: []string{"*.pdf"}},
 		},
-	})
-	if err != nil {
-		ui.ShowMessageBox(c, "Error", "Cannot open save dialog: "+err.Error())
-		return
 	}
-	if path == "" {
-		return
-	}
+	c.Form().ShowSaveFileDialog(opts, func(path string, err error) {
+		if err != nil {
+			ui.ShowMessageBox(c, "Error", "Cannot open save dialog: "+err.Error())
+			return
+		}
+		if path == "" {
+			return
+		}
 
-	if err := os.WriteFile(path, data, 0644); err != nil {
-		ui.ShowMessageBox(c, "Error", "Cannot save report: "+err.Error())
-		return
-	}
-	ui.ShowMessageBox(c, "PDF report", "Report saved to "+path)
+		if err := os.WriteFile(path, data, 0644); err != nil {
+			ui.ShowMessageBox(c, "Error", "Cannot save report: "+err.Error())
+			return
+		}
+		ui.ShowMessageBox(c, "PDF report", "Report saved to "+path)
+	})
 }
