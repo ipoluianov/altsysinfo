@@ -73,7 +73,9 @@ var fi = Strings{
 	VisitWebsite: "Siirry verkkosivustoon",
 	Close:        "Sulje",
 
-	Install: "Asenna",
+	Install:   "Asenna",
+	Update:    "Päivitä",
+	Uninstall: "Poista asennus",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo kopioidaan kansioon " + dir + " ja lisätään Käynnistä-valikkoon, työpöydälle ja asennettujen sovellusten luetteloon. Jos se on jo asennettu sinne, se päivitetään. Asetukset säilyvät ennallaan.\n\nSen jälkeen AltSysInfo käynnistyy uudelleen sieltä."
 	},
@@ -157,7 +159,9 @@ var cs = Strings{
 	VisitWebsite: "Navštívit web",
 	Close:        "Zavřít",
 
-	Install: "Nainstalovat",
+	Install:   "Nainstalovat",
+	Update:    "Aktualizovat",
+	Uninstall: "Odinstalovat",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo bude zkopírován do " + dir + " a přidán do nabídky Start, na plochu a do seznamu nainstalovaných aplikací. Pokud tam už nainstalován je, bude aktualizován. Nastavení zůstane beze změny.\n\nAltSysInfo se poté znovu spustí odtamtud."
 	},
@@ -241,7 +245,9 @@ var sk = Strings{
 	VisitWebsite: "Navštíviť web",
 	Close:        "Zavrieť",
 
-	Install: "Nainštalovať",
+	Install:   "Nainštalovať",
+	Update:    "Aktualizovať",
+	Uninstall: "Odinštalovať",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo sa skopíruje do " + dir + " a pridá do ponuky Štart, na pracovnú plochu a do zoznamu nainštalovaných aplikácií. Ak je tam už nainštalovaný, aktualizuje sa. Nastavenia zostanú bez zmeny.\n\nAltSysInfo sa potom znova spustí odtiaľ."
 	},
@@ -325,7 +331,9 @@ var sl = Strings{
 	VisitWebsite: "Obišči spletno mesto",
 	Close:        "Zapri",
 
-	Install: "Namesti",
+	Install:   "Namesti",
+	Update:    "Posodobi",
+	Uninstall: "Odstrani",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo bo kopiran v " + dir + " in dodan v meni Start, na namizje in na seznam nameščenih aplikacij. Če je tam že nameščen, bo posodobljen. Nastavitve ostanejo nespremenjene.\n\nAltSysInfo se bo nato znova zagnal od tam."
 	},

@@ -66,6 +66,20 @@ PNG_SIZE=$(wc -c < "$PNG" | tr -d ' ')
   cat "$PNG"
 } > "$BUNDLE/Contents/Resources/${APP}.icns"
 
+# Developer ID signing from the login keychain; skipped with a warning where
+# codesign or the certificate is missing (other machines, Linux, Windows)
+SIGN_IDENTITY="${MACOS_SIGN_IDENTITY:-Developer ID Application: Ivan Poluianov (GKCU2PYV7S)}"
+SIGN=0
+if command -v codesign >/dev/null 2>&1 &&
+  security find-identity -v -p codesigning | grep -qF "\"${SIGN_IDENTITY}\""; then
+  SIGN=1
+  # Hardened runtime (--options runtime) is required for notarization
+  codesign --force --options runtime --timestamp --sign "$SIGN_IDENTITY" "$BUNDLE"
+  codesign --verify --strict "$BUNDLE"
+else
+  echo "Warning: no \"${SIGN_IDENTITY}\" in the keychain, ${DMG} is unsigned" >&2
+fi
+
 # Drag-to-install shortcut (cannot be created on Windows, so optional)
 ln -s /Applications "$STAGE/Applications" 2>/dev/null || true
 
@@ -78,4 +92,9 @@ case "$TOOL" in
   xorriso)
     xorriso -as mkisofs -quiet -V "$DISPLAY_NAME" -D -R -hfsplus -no-pad -o "$DMG" "$STAGE" ;;
 esac
+
+if [ "$SIGN" = 1 ]; then
+  codesign --force --timestamp --sign "$SIGN_IDENTITY" "$DMG"
+fi
+# Notarization is separate and slower: build/notarize.sh
 echo "Packed ${DMG}"

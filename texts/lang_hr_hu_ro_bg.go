@@ -77,7 +77,9 @@ var hr = Strings{
 	VisitWebsite: "Posjeti web-mjesto",
 	Close:        "Zatvori",
 
-	Install: "Instaliraj",
+	Install:   "Instaliraj",
+	Update:    "Ažuriraj",
+	Uninstall: "Deinstaliraj",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo će se kopirati u " + dir + " i dodati u izbornik Start, na radnu površinu i na popis instaliranih aplikacija. Ako je ondje već instaliran, bit će ažuriran. Postavke ostaju nepromijenjene.\n\nAltSysInfo će se zatim ponovno pokrenuti odande."
 	},
@@ -165,7 +167,9 @@ var hu = Strings{
 	VisitWebsite: "Webhely megnyitása",
 	Close:        "Bezárás",
 
-	Install: "Telepítés",
+	Install:   "Telepítés",
+	Update:    "Frissítés",
+	Uninstall: "Eltávolítás",
 	InstallAsk: func(dir string) string {
 		return "Az AltSysInfo a következő helyre lesz másolva: " + dir + ". Bekerül a Start menübe, az asztalra és a telepített alkalmazások listájába. Ha már telepítve van ott, frissül. A beállítások változatlanok maradnak.\n\nEzután az AltSysInfo onnan indul újra."
 	},
@@ -253,7 +257,9 @@ var ro = Strings{
 	VisitWebsite: "Vizitați site-ul web",
 	Close:        "Închidere",
 
-	Install: "Instalare",
+	Install:   "Instalare",
+	Update:    "Actualizare",
+	Uninstall: "Dezinstalare",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo va fi copiat în " + dir + " și adăugat în meniul Start, pe desktop și în lista de aplicații instalate. Dacă este deja instalat acolo, va fi actualizat. Setările rămân neschimbate.\n\nApoi AltSysInfo va reporni de acolo."
 	},
@@ -343,7 +349,9 @@ var bg = Strings{
 	VisitWebsite: "Посетете уебсайта",
 	Close:        "Затваряне",
 
-	Install: "Инсталиране",
+	Install:   "Инсталиране",
+	Update:    "Актуализиране",
+	Uninstall: "Деинсталиране",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo ще бъде копиран в " + dir + " и добавен в менюто „Старт“, на работния плот и в списъка с инсталирани приложения. Ако вече е инсталиран там, ще бъде актуализиран. Настройките остават непроменени.\n\nСлед това AltSysInfo ще се рестартира оттам."
 	},

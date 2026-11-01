@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Installer for __DISPLAY_NAME__ __TAG__ (linux/amd64)
-# Usage: curl -fsSL https://github.com/__REPO__/releases/latest/download/linux-x64-install.sh | bash
+# Installer for __DISPLAY_NAME__ __TAG__ (linux/amd64 and linux/arm64,
+# picked by the machine it runs on)
+# Usage: curl -fsSL https://github.com/__REPO__/releases/latest/download/linux-install.sh | bash
 #
 # Layout (flat, shared by all utilities):
 #   ~/.altbins/<app>                  - binary
@@ -13,7 +14,6 @@ APP="__APP__"
 DISPLAY_NAME="__DISPLAY_NAME__"
 TAG="__TAG__"
 REPO="__REPO__"
-URL="https://github.com/${REPO}/releases/download/${TAG}/${APP}-${TAG}-linux-amd64.tar.gz"
 
 BIN_DIR="${HOME}/.altbins"
 BIN="${BIN_DIR}/${APP}"
@@ -25,14 +25,21 @@ die() { echo "Error: $*" >&2; exit 1; }
 
 [ "$(uname -s)" = "Linux" ] || die "this installer is for Linux only"
 case "$(uname -m)" in
-  x86_64|amd64) ;;
-  *) die "unsupported architecture: $(uname -m) (expected x86_64)" ;;
+  x86_64|amd64) ARCH=amd64 ;;
+  aarch64|arm64|armv8*) ARCH=arm64 ;;
+  *) die "unsupported architecture: $(uname -m) (expected x86_64 or aarch64)" ;;
 esac
+# A 64-bit kernel may run a 32-bit system (e.g. Raspberry Pi OS): the binary
+# would start, but find no 64-bit libX11 to load
+if [ "$(getconf LONG_BIT 2>/dev/null || echo 64)" != 64 ]; then
+  die "a 64-bit system is required, this one is $(getconf LONG_BIT)-bit"
+fi
+URL="https://github.com/${REPO}/releases/download/${TAG}/${APP}-${TAG}-linux-${ARCH}.tar.gz"
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
-echo "Downloading ${DISPLAY_NAME} ${TAG}..."
+echo "Downloading ${DISPLAY_NAME} ${TAG} (${ARCH})..."
 if command -v curl >/dev/null 2>&1; then
   curl -fL --progress-bar -o "$TMP/app.tar.gz" "$URL"
 elif command -v wget >/dev/null 2>&1; then

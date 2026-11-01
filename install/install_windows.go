@@ -43,14 +43,37 @@ func iconPath() string {
 	return filepath.Join(Dir(), "."+appName+"-icon.ico")
 }
 
-// Available tells whether the Install button makes sense: this copy is not
-// the installed one
-func Available() bool {
-	return !isInstalledCopy()
+// CurrentStatus compares this copy with the installed one
+func CurrentStatus() Status {
+	if IsInstalledCopy() {
+		return StatusUninstall
+	}
+	if _, err := os.Stat(ExePath()); err != nil {
+		return StatusInstall
+	}
+	if versionNewer(app.Version, installedVersion()) {
+		return StatusUpdate
+	}
+	return StatusUninstall
 }
 
-// isInstalledCopy tells whether the running binary is the installed one
-func isInstalledCopy() bool {
+// installedVersion is the version of the installed copy from its entry in
+// "Installed apps", or "" if it cannot be read
+func installedVersion() string {
+	k, err := registry.OpenKey(registry.CURRENT_USER, uninstallKey, registry.QUERY_VALUE)
+	if err != nil {
+		return ""
+	}
+	defer k.Close()
+	v, _, err := k.GetStringValue("DisplayVersion")
+	if err != nil {
+		return ""
+	}
+	return v
+}
+
+// IsInstalledCopy tells whether the running binary is the installed one
+func IsInstalledCopy() bool {
 	exe, err := runningExe()
 	if err != nil {
 		return false
@@ -221,7 +244,7 @@ func Uninstall() error {
 	}
 	os.Remove(iconPath())
 	os.Remove(ExePath() + ".old")
-	if isInstalledCopy() {
+	if IsInstalledCopy() {
 		return deleteAfterExit(ExePath())
 	}
 	if err := os.Remove(ExePath()); err != nil && !os.IsNotExist(err) {
@@ -230,12 +253,13 @@ func Uninstall() error {
 	return nil
 }
 
-// deleteAfterExit has cmd wait a couple of seconds for this process to quit
-// and delete the file
+// deleteAfterExit has cmd try to delete the file every second, for up to a
+// minute, until this process has quit (the window may take a while to close)
 func deleteAfterExit(path string) error {
 	cmd := exec.Command("cmd.exe")
 	cmd.SysProcAttr = &syscall.SysProcAttr{
-		CmdLine:       `cmd.exe /d /c ping -n 3 127.0.0.1 >nul & del /f /q "` + path + `"`,
+		CmdLine: `cmd.exe /d /c for /l %i in (1,1,60) do (ping -n 2 127.0.0.1 >nul & del /f /q "` + path +
+			`" 2>nul & if not exist "` + path + `" exit /b)`,
 		HideWindow:    true,
 		CreationFlags: windows.CREATE_NO_WINDOW,
 	}

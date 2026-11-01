@@ -73,7 +73,9 @@ var pl = Strings{
 	VisitWebsite: "Odwiedź stronę",
 	Close:        "Zamknij",
 
-	Install: "Zainstaluj",
+	Install:   "Zainstaluj",
+	Update:    "Zaktualizuj",
+	Uninstall: "Odinstaluj",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo zostanie skopiowany do " + dir + " i dodany do menu Start, na pulpit i do listy zainstalowanych aplikacji. Jeśli jest już tam zainstalowany, zostanie zaktualizowany. Ustawienia pozostaną bez zmian.\n\nNastępnie AltSysInfo uruchomi się ponownie stamtąd."
 	},
@@ -161,7 +163,9 @@ var sr = Strings{
 	VisitWebsite: "Посети сајт",
 	Close:        "Затвори",
 
-	Install: "Инсталирај",
+	Install:   "Инсталирај",
+	Update:    "Ажурирај",
+	Uninstall: "Деинсталирај",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo ће бити копиран у " + dir + " и додат у мени Старт, на радну површину и у листу инсталираних апликација. Ако је тамо већ инсталиран, биће ажуриран. Подешавања остају непромењена.\n\nAltSysInfo ће се затим поново покренути одатле."
 	},
@@ -245,7 +249,9 @@ var de = Strings{
 	VisitWebsite: "Website besuchen",
 	Close:        "Schließen",
 
-	Install: "Installieren",
+	Install:   "Installieren",
+	Update:    "Aktualisieren",
+	Uninstall: "Deinstallieren",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo wird nach " + dir + " kopiert und zum Startmenü, zum Desktop und zur Liste der installierten Apps hinzugefügt. Ist es dort bereits installiert, wird es aktualisiert. Die Einstellungen bleiben erhalten.\n\nAltSysInfo startet danach von dort neu."
 	},

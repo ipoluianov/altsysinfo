@@ -6,8 +6,12 @@ import "errors"
 
 var errNotSupported = errors.New("installation is supported on Windows only")
 
-// Available tells whether the Install button makes sense: never here
-func Available() bool {
+// CurrentStatus is always StatusNone: there is nothing to offer here
+func CurrentStatus() Status {
+	return StatusNone
+}
+
+func IsInstalledCopy() bool {
 	return false
 }
 

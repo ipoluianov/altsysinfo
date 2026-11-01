@@ -83,7 +83,9 @@ var el = Strings{
 	VisitWebsite: "Επίσκεψη στην τοποθεσία web",
 	Close:        "Κλείσιμο",
 
-	Install: "Εγκατάσταση",
+	Install:   "Εγκατάσταση",
+	Update:    "Ενημέρωση",
+	Uninstall: "Κατάργηση εγκατάστασης",
 	InstallAsk: func(dir string) string {
 		return "Το AltSysInfo θα αντιγραφεί στο " + dir + " και θα προστεθεί στο μενού Έναρξη, στην επιφάνεια εργασίας και στη λίστα εγκατεστημένων εφαρμογών. Αν είναι ήδη εγκατεστημένο εκεί, θα ενημερωθεί. Οι ρυθμίσεις παραμένουν ως έχουν.\n\nΣτη συνέχεια το AltSysInfo θα επανεκκινηθεί από εκεί."
 	},
@@ -169,7 +171,9 @@ var lt = Strings{
 	VisitWebsite: "Apsilankyti svetainėje",
 	Close:        "Uždaryti",
 
-	Install: "Įdiegti",
+	Install:   "Įdiegti",
+	Update:    "Naujinti",
+	Uninstall: "Pašalinti",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo bus nukopijuotas į " + dir + " ir įtrauktas į meniu Pradžia, darbalaukį ir įdiegtų programų sąrašą. Jei jis ten jau įdiegtas, bus atnaujintas. Parametrai liks nepakeisti.\n\nTada AltSysInfo bus paleistas iš naujo iš ten."
 	},
@@ -253,7 +257,9 @@ var lv = Strings{
 	VisitWebsite: "Apmeklēt tīmekļa vietni",
 	Close:        "Aizvērt",
 
-	Install: "Instalēt",
+	Install:   "Instalēt",
+	Update:    "Atjaunināt",
+	Uninstall: "Atinstalēt",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo tiks iekopēts mapē " + dir + " un pievienots izvēlnei Sākt, darbvirsmai un instalēto programmu sarakstam. Ja tas tur jau ir instalēts, tas tiks atjaunināts. Iestatījumi paliks nemainīti.\n\nPēc tam AltSysInfo tiks restartēts no turienes."
 	},
@@ -337,7 +343,9 @@ var et = Strings{
 	VisitWebsite: "Külasta veebisaiti",
 	Close:        "Sule",
 
-	Install: "Installi",
+	Install:   "Installi",
+	Update:    "Värskenda",
+	Uninstall: "Desinstalli",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo kopeeritakse kausta " + dir + " ning lisatakse menüüsse Start, töölauale ja installitud rakenduste loendisse. Kui see on seal juba installitud, siis seda värskendatakse. Sätted jäävad muutmata.\n\nSeejärel käivitub AltSysInfo sealt uuesti."
 	},

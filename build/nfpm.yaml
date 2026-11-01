@@ -32,3 +32,6 @@ overrides:
   rpm:
     depends: [libX11]
     recommends: [libXext, libXinerama, freetype]
+
+scripts:
+  preremove: build/preremove.sh

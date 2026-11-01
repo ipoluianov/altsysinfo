@@ -73,7 +73,9 @@ var nl = Strings{
 	VisitWebsite: "Website bezoeken",
 	Close:        "Sluiten",
 
-	Install: "Installeren",
+	Install:   "Installeren",
+	Update:    "Bijwerken",
+	Uninstall: "Verwijderen",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo wordt gekopieerd naar " + dir + " en toegevoegd aan het menu Start, het bureaublad en de lijst met geïnstalleerde apps. Als het daar al is geïnstalleerd, wordt het bijgewerkt. Instellingen blijven behouden.\n\nDaarna wordt AltSysInfo vanaf daar opnieuw gestart."
 	},
@@ -157,7 +159,9 @@ var sv = Strings{
 	VisitWebsite: "Besök webbplatsen",
 	Close:        "Stäng",
 
-	Install: "Installera",
+	Install:   "Installera",
+	Update:    "Uppdatera",
+	Uninstall: "Avinstallera",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo kopieras till " + dir + " och läggs till i Start-menyn, på skrivbordet och i listan över installerade appar. Om det redan är installerat där uppdateras det. Inställningarna behålls.\n\nSedan startas AltSysInfo om därifrån."
 	},
@@ -241,7 +245,9 @@ var da = Strings{
 	VisitWebsite: "Besøg webstedet",
 	Close:        "Luk",
 
-	Install: "Installer",
+	Install:   "Installer",
+	Update:    "Opdater",
+	Uninstall: "Afinstaller",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo kopieres til " + dir + " og føjes til menuen Start, skrivebordet og listen over installerede apps. Hvis det allerede er installeret der, opdateres det. Indstillingerne bevares.\n\nDerefter genstartes AltSysInfo derfra."
 	},
@@ -325,7 +331,9 @@ var nb = Strings{
 	VisitWebsite: "Besøk nettstedet",
 	Close:        "Lukk",
 
-	Install: "Installer",
+	Install:   "Installer",
+	Update:    "Oppdater",
+	Uninstall: "Avinstaller",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo kopieres til " + dir + " og legges til på Start-menyen, skrivebordet og i listen over installerte apper. Hvis det allerede er installert der, oppdateres det. Innstillingene beholdes.\n\nDeretter startes AltSysInfo på nytt derfra."
 	},

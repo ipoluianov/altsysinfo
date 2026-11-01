@@ -31,6 +31,8 @@ set "STAMP=%BUILD_STAMP%"
 if not defined STAMP for /f %%t in ('powershell -NoProfile -Command "Get-Date -Format yyyy-MM-dd-HH-mm"') do set "STAMP=%%t"
 set "DIR=bin\%STAMP%-%VERSION%"
 set "OUT=%DIR%\%APP%-%T_OS%-%T_ARCH%%EXT%"
+rem Windows is built for amd64 only, so its exe needs no platform suffix
+if "%T_OS%"=="windows" set "OUT=%DIR%\%APP%.exe"
 if not exist "%DIR%" mkdir "%DIR%"
 echo Building %OUT%
 if not "%T_OS%"=="windows" goto build
@@ -68,18 +70,18 @@ for %%f in (deb rpm) do (
   go run "github.com/goreleaser/nfpm/v2/cmd/nfpm@%NFPM_VERSION%" pkg --config build/nfpm.yaml --packager %%f --target "%OUT%.%%f" || set "RC=1"
 )
 
-rem Archive for scripts\linux-x64-install.sh: the binary and the menu icon
+rem Archive for scripts\linux-install.sh: the binary and the menu icon
 copy /y icon.svg bin\.pkg\altsysinfo.svg >nul
 set "TAR=tar"
 if exist "%SystemRoot%\System32\tar.exe" set "TAR=%SystemRoot%\System32\tar.exe"
 "%TAR%" -czf "%DIR%\%APP%-%VERSION%-linux-%T_ARCH%.tar.gz" -C bin\.pkg altsysinfo altsysinfo.svg || set "RC=1"
 rmdir /s /q bin\.pkg
 
-rem The installer downloads that archive from the release of this tag.
+rem The installer downloads the archive for its machine from the release of
+rem this tag; it is the same for both architectures, so each build writes it.
 rem Written as UTF-8 without BOM and with LF, or bash would not run it.
-if not "%T_ARCH%"=="amd64" goto done
-powershell -NoProfile -NonInteractive -Command "$s = [IO.File]::ReadAllText('scripts\linux-x64-install.sh') -replace \"`r\", '' -replace '__APP__', '%APP%' -replace '__DISPLAY_NAME__', 'AltSysInfo' -replace '__TAG__', '%VERSION%' -replace '__REPO__', '%REPO%'; [IO.File]::WriteAllText('%DIR%\linux-x64-install.sh', $s, (New-Object Text.UTF8Encoding $false))" || set "RC=1"
-echo %VERSION%| findstr /r "^v[0-9.]*$" >nul || echo Warning: %VERSION% is not a clean tag, linux-x64-install.sh points to a release that may not exist
+powershell -NoProfile -NonInteractive -Command "$s = [IO.File]::ReadAllText('scripts\linux-install.sh') -replace \"`r\", '' -replace '__APP__', '%APP%' -replace '__DISPLAY_NAME__', 'AltSysInfo' -replace '__TAG__', '%VERSION%' -replace '__REPO__', '%REPO%'; [IO.File]::WriteAllText('%DIR%\linux-install.sh', $s, (New-Object Text.UTF8Encoding $false))" || set "RC=1"
+echo %VERSION%| findstr /r "^v[0-9.]*$" >nul || echo Warning: %VERSION% is not a clean tag, linux-install.sh points to a release that may not exist
 goto done
 
 :darwin

@@ -73,7 +73,9 @@ var tr = Strings{
 	VisitWebsite: "Web sitesini ziyaret et",
 	Close:        "Kapat",
 
-	Install: "Yükle",
+	Install:   "Yükle",
+	Update:    "Güncelleştir",
+	Uninstall: "Kaldır",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo şu klasöre kopyalanacak: " + dir + ". Başlat menüsüne, masaüstüne ve yüklü uygulamalar listesine eklenecek. Zaten orada yüklüyse güncelleştirilir. Ayarlar olduğu gibi kalır.\n\nArdından AltSysInfo oradan yeniden başlatılacak."
 	},
@@ -157,7 +159,9 @@ var ind = Strings{
 	VisitWebsite: "Kunjungi situs web",
 	Close:        "Tutup",
 
-	Install: "Instal",
+	Install:   "Instal",
+	Update:    "Perbarui",
+	Uninstall: "Copot instalan",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo akan disalin ke " + dir + " dan ditambahkan ke menu Start, desktop, dan daftar aplikasi terinstal. Jika sudah terinstal di sana, AltSysInfo akan diperbarui. Pengaturan tetap seperti semula.\n\nSetelah itu AltSysInfo akan dimulai ulang dari sana."
 	},
@@ -241,7 +245,9 @@ var vi = Strings{
 	VisitWebsite: "Truy cập trang web",
 	Close:        "Đóng",
 
-	Install: "Cài đặt",
+	Install:   "Cài đặt",
+	Update:    "Cập nhật",
+	Uninstall: "Gỡ cài đặt",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo sẽ được sao chép vào " + dir + " và thêm vào menu Start, màn hình nền và danh sách ứng dụng đã cài đặt. Nếu đã được cài đặt ở đó, AltSysInfo sẽ được cập nhật. Cài đặt được giữ nguyên.\n\nSau đó AltSysInfo sẽ khởi động lại từ vị trí đó."
 	},

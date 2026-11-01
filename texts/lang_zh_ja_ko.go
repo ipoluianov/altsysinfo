@@ -73,7 +73,9 @@ var zh = Strings{
 	VisitWebsite: "访问网站",
 	Close:        "关闭",
 
-	Install: "安装",
+	Install:   "安装",
+	Update:    "更新",
+	Uninstall: "卸载",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo 将被复制到 " + dir + "，并添加到开始菜单、桌面和已安装应用列表中。如果已经安装，则会更新。设置保持不变。\n\n然后 AltSysInfo 将从那里重新启动。"
 	},
@@ -157,7 +159,9 @@ var ja = Strings{
 	VisitWebsite: "Web サイトを開く",
 	Close:        "閉じる",
 
-	Install: "インストール",
+	Install:   "インストール",
+	Update:    "更新",
+	Uninstall: "アンインストール",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo を " + dir + " にコピーし、スタート メニュー、デスクトップ、インストール済みアプリの一覧に追加します。すでにインストールされている場合は更新されます。設定はそのまま残ります。\n\nその後、AltSysInfo はそこから再起動します。"
 	},
@@ -241,7 +245,9 @@ var ko = Strings{
 	VisitWebsite: "웹사이트 방문",
 	Close:        "닫기",
 
-	Install: "설치",
+	Install:   "설치",
+	Update:    "업데이트",
+	Uninstall: "제거",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo가 " + dir + "에 복사되고 시작 메뉴, 바탕 화면, 설치된 앱 목록에 추가됩니다. 이미 설치되어 있으면 업데이트됩니다. 설정은 그대로 유지됩니다.\n\n그런 다음 AltSysInfo가 그곳에서 다시 시작됩니다."
 	},

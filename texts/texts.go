@@ -77,6 +77,8 @@ type Strings struct {
 
 	// Installing a downloaded copy to ~/.altbins (Windows) and removing it
 	Install          string
+	Update           string // an older version is installed
+	Uninstall        string
 	InstallAsk       func(dir string) string
 	InstallFailed    func(err string) string
 	Installed        string // a toast in the installed copy

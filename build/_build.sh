@@ -26,6 +26,8 @@ fi
 
 DIR="bin/${BUILD_STAMP:-$(date +%Y-%m-%d-%H-%M)}-${VERSION}"
 OUT="${DIR}/${APP}-${GOOS_T}-${GOARCH_T}${EXT}"
+# Windows is built for amd64 only, so its exe needs no platform suffix
+[ "$GOOS_T" = "windows" ] && OUT="${DIR}/${APP}.exe"
 mkdir -p "$DIR"
 echo "Building ${OUT}"
 if [ "$GOOS_T" = "windows" ]; then
@@ -54,21 +56,20 @@ if [ "$GOOS_T" = "linux" ]; then
       pkg --config build/nfpm.yaml --packager "$fmt" --target "${OUT}.${fmt}"
   done
 
-  # Archive for scripts/linux-x64-install.sh: the binary and the menu icon
+  # Archive for scripts/linux-install.sh: the binary and the menu icon
   cp icon.svg bin/.pkg/altsysinfo.svg
   chmod 755 bin/.pkg/altsysinfo
   tar -czf "${DIR}/${APP}-${VERSION}-linux-${GOARCH_T}.tar.gz" -C bin/.pkg altsysinfo altsysinfo.svg
   rm -rf bin/.pkg
 
-  # The installer downloads that archive from the release of this tag
-  if [ "$GOARCH_T" = "amd64" ]; then
-    tr -d '\r' < scripts/linux-x64-install.sh | sed \
-      -e "s|__APP__|${APP}|g" \
-      -e "s|__DISPLAY_NAME__|AltSysInfo|g" \
-      -e "s|__TAG__|${VERSION}|g" \
-      -e "s|__REPO__|${REPO}|g" > "${DIR}/linux-x64-install.sh"
-    chmod 755 "${DIR}/linux-x64-install.sh"
-    [[ "$VERSION" =~ ^v[0-9.]+$ ]] ||
-      echo "Warning: ${VERSION} is not a clean tag, linux-x64-install.sh points to a release that may not exist" >&2
-  fi
+  # The installer downloads the archive for its machine from the release of
+  # this tag; it is the same for both architectures, so each build writes it
+  tr -d '\r' < scripts/linux-install.sh | sed \
+    -e "s|__APP__|${APP}|g" \
+    -e "s|__DISPLAY_NAME__|AltSysInfo|g" \
+    -e "s|__TAG__|${VERSION}|g" \
+    -e "s|__REPO__|${REPO}|g" > "${DIR}/linux-install.sh"
+  chmod 755 "${DIR}/linux-install.sh"
+  [[ "$VERSION" =~ ^v[0-9.]+$ ]] ||
+    echo "Warning: ${VERSION} is not a clean tag, linux-install.sh points to a release that may not exist" >&2
 fi

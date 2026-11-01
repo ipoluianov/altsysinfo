@@ -73,7 +73,9 @@ var en = Strings{
 	VisitWebsite: "Visit Website",
 	Close:        "Close",
 
-	Install: "Install",
+	Install:   "Install",
+	Update:    "Update",
+	Uninstall: "Uninstall",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo will be copied to " + dir + " and added to the Start menu, the desktop and the list of installed apps. If it is already installed there, it is updated. Settings stay as they are.\n\nAltSysInfo will then restart from there."
 	},
@@ -161,7 +163,9 @@ var ru = Strings{
 	VisitWebsite: "Открыть сайт",
 	Close:        "Закрыть",
 
-	Install: "Установить",
+	Install:   "Установить",
+	Update:    "Обновить",
+	Uninstall: "Удалить",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo будет скопирован в " + dir + " и добавлен в меню «Пуск», на рабочий стол и в список установленных приложений. Если он там уже установлен, он будет обновлён. Настройки сохранятся.\n\nЗатем AltSysInfo перезапустится оттуда."
 	},

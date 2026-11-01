@@ -73,7 +73,9 @@ var fr = Strings{
 	VisitWebsite: "Visiter le site",
 	Close:        "Fermer",
 
-	Install: "Installer",
+	Install:   "Installer",
+	Update:    "Mettre à jour",
+	Uninstall: "Désinstaller",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo sera copié dans " + dir + " et ajouté au menu Démarrer, au bureau et à la liste des applications installées. S'il y est déjà installé, il sera mis à jour. Les paramètres sont conservés.\n\nAltSysInfo redémarrera ensuite depuis cet emplacement."
 	},
@@ -157,7 +159,9 @@ var es = Strings{
 	VisitWebsite: "Visitar el sitio web",
 	Close:        "Cerrar",
 
-	Install: "Instalar",
+	Install:   "Instalar",
+	Update:    "Actualizar",
+	Uninstall: "Desinstalar",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo se copiará en " + dir + " y se añadirá al menú Inicio, al escritorio y a la lista de aplicaciones instaladas. Si ya está instalado allí, se actualizará. Los ajustes se mantienen.\n\nDespués AltSysInfo se reiniciará desde allí."
 	},
@@ -241,7 +245,9 @@ var it = Strings{
 	VisitWebsite: "Visita il sito",
 	Close:        "Chiudi",
 
-	Install: "Installa",
+	Install:   "Installa",
+	Update:    "Aggiorna",
+	Uninstall: "Disinstalla",
 	InstallAsk: func(dir string) string {
 		return "AltSysInfo verrà copiato in " + dir + " e aggiunto al menu Start, al desktop e all'elenco delle app installate. Se è già installato lì, verrà aggiornato. Le impostazioni restano invariate.\n\nAltSysInfo si riavvierà poi da lì."
 	},
@@ -325,7 +331,9 @@ var pt = Strings{
 	VisitWebsite: "Visitar o site",
 	Close:        "Fechar",
 
-	Install: "Instalar",
+	Install:   "Instalar",
+	Update:    "Atualizar",
+	Uninstall: "Desinstalar",
 	InstallAsk: func(dir string) string {
 		return "O AltSysInfo será copiado para " + dir + " e adicionado ao menu Iniciar, à área de trabalho e à lista de aplicativos instalados. Se já estiver instalado lá, será atualizado. As configurações são mantidas.\n\nDepois o AltSysInfo será reiniciado a partir de lá."
 	},
