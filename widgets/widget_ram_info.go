@@ -40,6 +40,8 @@ func (c *WidgetRamInfo) LoadRamInfo(info system.Info) {
 		c.lvItems.SetRowCount(i + 1)
 		c.lvItems.SetCellText2(i, 0, ram.Model)
 		c.lvItems.SetCellText2(i, 1, strconv.FormatUint(ram.Size/1024/1024, 10)+" MB")
-		c.lvItems.SetCellText2(i, 2, strconv.FormatUint(ram.Speed, 10)+" MHz")
+		if ram.Speed > 0 { // unknown on Apple Silicon
+			c.lvItems.SetCellText2(i, 2, strconv.FormatUint(ram.Speed, 10)+" MHz")
+		}
 	}
 }

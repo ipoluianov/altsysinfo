@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-pdf/fpdf"
+	"github.com/ipoluianov/altsysinfo/app"
 	"github.com/ipoluianov/altsysinfo/system"
 )
 
@@ -28,7 +29,7 @@ func GeneratePDF(info system.Info) ([]byte, error) {
 		pdf.SetY(-12)
 		pdf.SetFont("Helvetica", "", 8)
 		pdf.SetTextColor(128, 128, 128)
-		pdf.CellFormat(pageWidth/2, 5, "SysInfo report - "+generated, "", 0, "L", false, 0, "")
+		pdf.CellFormat(pageWidth/2, 5, app.DisplayName+" report - "+generated, "", 0, "L", false, 0, "")
 		pdf.CellFormat(pageWidth/2, 5, "Page "+strconv.Itoa(pdf.PageNo()), "", 0, "R", false, 0, "")
 	})
 
@@ -93,27 +94,35 @@ func GeneratePDF(info system.Info) ([]byte, error) {
 			strconv.Itoa(i + 1),
 			ram.Model,
 			formatMB(ram.Size),
-			strconv.FormatUint(ram.Speed, 10) + " MT/s",
+			formatSpeed(ram.Speed),
 		})
 	}
 	table([]string{"#", "Model", "Size", "Speed"}, []float64{10, 90, 40, 40}, ramRows)
 
 	section("Drives")
+	// macOS has no separate device name: the name is the model
+	namedDrives := false
+	for _, drive := range info.Drives {
+		namedDrives = namedDrives || drive.Name != drive.Model
+	}
 	var driveRows [][]string
 	for _, drive := range info.Drives {
-		driveRows = append(driveRows, []string{
-			drive.Name,
-			drive.Model,
-			drive.Type,
-			strconv.FormatUint(drive.Size/1024/1024/1024, 10) + " GB",
-		})
+		row := []string{drive.Model, drive.Type, strconv.FormatUint(drive.Size/1024/1024/1024, 10) + " GB"}
+		if namedDrives {
+			row = append([]string{drive.Name}, row...)
+		}
+		driveRows = append(driveRows, row)
 	}
-	table([]string{"Name", "Model", "Type", "Size"}, []float64{25, 105, 20, 30}, driveRows)
+	if namedDrives {
+		table([]string{"Name", "Model", "Type", "Size"}, []float64{25, 105, 20, 30}, driveRows)
+	} else {
+		table([]string{"Model", "Type", "Size"}, []float64{130, 20, 30}, driveRows)
+	}
 
 	section("Graphics")
 	var gpuRows [][]string
 	for _, gpu := range info.GPUs {
-		gpuRows = append(gpuRows, []string{gpu.Model, gpu.Vendor + ":" + gpu.Device, gpu.Driver})
+		gpuRows = append(gpuRows, []string{gpu.Model, gpuID(gpu), gpu.Driver})
 	}
 	table([]string{"Model", "ID", "Driver"}, []float64{125, 30, 25}, gpuRows)
 
@@ -122,6 +131,22 @@ func GeneratePDF(info system.Info) ([]byte, error) {
 		return nil, err
 	}
 	return buf.Bytes(), nil
+}
+
+// formatSpeed is empty when the speed is unknown (Apple Silicon)
+func formatSpeed(speed uint64) string {
+	if speed == 0 {
+		return ""
+	}
+	return strconv.FormatUint(speed, 10) + " MT/s"
+}
+
+// gpuID is "vendor:device", empty for GPUs without PCI IDs (Apple Silicon)
+func gpuID(gpu system.GPUInfo) string {
+	if gpu.Vendor == "" && gpu.Device == "" {
+		return ""
+	}
+	return gpu.Vendor + ":" + gpu.Device
 }
 
 func formatMB(bytes uint64) string {

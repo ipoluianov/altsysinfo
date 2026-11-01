@@ -70,7 +70,7 @@ func getDrives() ([]DriveInfo, error) {
 	for _, volume := range systemProfiler("SPStorageDataType") {
 		drive, _ := volume["physical_drive"].(map[string]any)
 		name := profilerString(drive["device_name"])
-		if name == "" {
+		if name == "" || profilerString(drive["protocol"]) == "Disk Image" {
 			continue
 		}
 		d, ok := byName[name]
@@ -198,12 +198,37 @@ func profilerUint(v any) uint64 {
 var (
 	// Data type prefixes are dropped ("spdisplays_vram" -> "vram"); for other
 	// "sp" identifiers only "sp" is dropped ("spbattery_information").
-	profilerPrefix     = regexp.MustCompile(`^(sppci_vendor|sppci|spdisplays|sppower|spusb|spaudio|spnvme|spsata|spstorage|spnetwork|spmemory|sphardware|spsoftware)_|^sp([a-z0-9]+_)`)
+	profilerPrefix     = regexp.MustCompile(`^(sppci_vendor|sppci|spdisplays|sppower|spusb|spaudio|spnvme|spsata|spstorage|spnetwork|spmemory|sphardware|spsoftware|coreaudio_device_type|coreaudio)_|^sp([a-z0-9]+_)`)
 	profilerIdentifier = regexp.MustCompile(`^[a-z0-9]+(_[a-z0-9]+)+$`)
+	// "2560x1664Retina" -> "2560 x 1664 Retina"
+	profilerResolution = regexp.MustCompile(`^([1-9]\d{2,})x(\d{2,})([A-Za-z]*)$`)
 )
+
+// profilerNames are the names of keys that are not readable after the
+// prefix is dropped; "_" keys listed here are shown too.
+var profilerNames = map[string]string{
+	"coreaudio_device":               "Audio devices",
+	"coreaudio_device_srate":         "Sample rate",
+	"sppower_information":            "Power settings",
+	"spdisplays_mtlgpufamilysupport": "Metal support",
+	"spdisplays_pixelresolution":     "Pixel resolution",
+	"_spdisplays_resolution":         "Resolution",
+	"USBKeyHardwareType":             "Hardware type",
+	"USBKeyLocationID":               "Location ID",
+}
+
+// profilerSkipped are keys that repeat what the page already shows.
+var profilerSkipped = map[string]bool{
+	"number_processors": true, // "proc 8:0:4:4", the cores are on the CPU page
+	"uptime":            true,
+	"kernel_version":    true,
+}
 
 // profilerName turns identifiers like "spdisplays_vram" into "Vram".
 func profilerName(s string) string {
+	if name, ok := profilerNames[s]; ok {
+		return name
+	}
 	s = profilerPrefix.ReplaceAllString(s, "$2")
 	s = strings.TrimSuffix(s, "_in_bytes")
 	s = strings.NewReplacer("_", " ", "-", " ").Replace(s)
@@ -223,7 +248,10 @@ func profilerValue(key string, v any) string {
 	}
 	s := profilerString(v)
 	if profilerPrefix.MatchString(s) || profilerIdentifier.MatchString(s) {
-		return profilerName(s)
+		s = profilerName(s)
+	}
+	if m := profilerResolution.FindStringSubmatch(s); m != nil {
+		s = strings.TrimSpace(m[1] + " x " + m[2] + " " + m[3])
 	}
 	return s
 }
@@ -239,7 +267,10 @@ func addProfilerItem(t *DetailTable, item map[string]any) {
 
 	var children []map[string]any
 	for _, k := range keys {
-		if strings.HasPrefix(k, "_") && k != "_items" {
+		if profilerSkipped[k] {
+			continue
+		}
+		if _, named := profilerNames[k]; strings.HasPrefix(k, "_") && k != "_items" && !named {
 			continue
 		}
 		switch v := item[k].(type) {
@@ -250,6 +281,10 @@ func addProfilerItem(t *DetailTable, item map[string]any) {
 				}
 			}
 		case map[string]any:
+			// Readable keys are groups of their own ("AC Power", "Battery Power")
+			if !profilerIdentifier.MatchString(k) {
+				t.Section(k)
+			}
 			nestedKeys := make([]string, 0, len(v))
 			for nk := range v {
 				nestedKeys = append(nestedKeys, nk)
@@ -270,10 +305,13 @@ func addProfilerItem(t *DetailTable, item map[string]any) {
 
 // addProfilerSections adds each item as a section titled by its name.
 func addProfilerSections(t *DetailTable, items []map[string]any) {
-	for _, item := range items {
+	for i, item := range items {
 		title := profilerValue("_name", item["_name"])
 		if strings.HasPrefix(title, "kHW_") { // internal names of built-in devices
 			title = profilerString(item["sppci_model"])
+		}
+		if title == "" && len(items) > 1 { // unnamed entries, e.g. scheduled power events
+			title = "#" + strconv.Itoa(i+1)
 		}
 		if title != "" {
 			t.Section(title)

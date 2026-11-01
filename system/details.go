@@ -52,6 +52,40 @@ func (t *DetailTable) AddValue(name, value string) {
 	t.Add(name, value)
 }
 
+// DropEmptyColumns removes the columns that are empty in every row.
+func (t *DetailTable) DropEmptyColumns() {
+	if len(t.Rows) == 0 {
+		return
+	}
+	var keep []int
+	for col := range t.Columns {
+		for _, row := range t.Rows {
+			if len(row) > 1 && col < len(row) && row[col] != "" {
+				keep = append(keep, col)
+				break
+			}
+		}
+	}
+	if len(keep) == len(t.Columns) {
+		return
+	}
+	pick := func(cells []string) []string {
+		result := make([]string, 0, len(keep))
+		for _, col := range keep {
+			if col < len(cells) {
+				result = append(result, cells[col])
+			}
+		}
+		return result
+	}
+	t.Columns = pick(t.Columns)
+	for i, row := range t.Rows {
+		if len(row) > 1 {
+			t.Rows[i] = pick(row)
+		}
+	}
+}
+
 // DetailCategory is a page with detailed information.
 type DetailCategory struct {
 	ID   string
@@ -80,7 +114,11 @@ func getSystemDetails() ([]*DetailTable, error) {
 
 	t.Section("Operating System")
 	if h, err := host.Info(); err == nil {
-		t.AddValue("Name", strings.TrimSpace(h.Platform+" "+h.PlatformVersion))
+		platform := h.Platform
+		if platform == "darwin" {
+			platform = "macOS"
+		}
+		t.AddValue("Name", strings.TrimSpace(platform+" "+h.PlatformVersion))
 		t.AddValue("Family", h.PlatformFamily)
 		t.AddValue("Kernel", h.KernelVersion)
 		t.AddValue("Architecture", h.KernelArch)
@@ -105,7 +143,7 @@ func getCPUDetails() ([]*DetailTable, error) {
 		c := infos[0]
 		t.AddValue("Model", c.ModelName)
 		t.AddValue("Vendor", c.VendorID)
-		if c.Family != "" {
+		if c.Family != "" && c.Family != "0" { // Apple Silicon reports zeros
 			t.AddValue("Family / Model / Stepping", fmt.Sprintf("%s / %s / %d", c.Family, c.Model, c.Stepping))
 		}
 		t.AddValue("Microcode", c.Microcode)
@@ -132,6 +170,9 @@ func getCPUDetails() ([]*DetailTable, error) {
 }
 
 func cpuFeatures() []string {
+	if features := platformCPUFeatures(); features != nil {
+		return features
+	}
 	var result []string
 	add := func(ok bool, name string) {
 		if ok {
@@ -189,15 +230,25 @@ func getStorageDetails() ([]*DetailTable, error) {
 			if d.Vendor != "" && d.Vendor != "ATA" && !strings.HasPrefix(model, d.Vendor) {
 				model = d.Vendor + " " + model
 			}
-			drives.Add(d.Name, model, d.Type, formatBytes(d.Size))
+			name := d.Name
+			if name == model { // macOS has no separate device name
+				name = ""
+			}
+			drives.Add(name, model, d.Type, formatBytes(d.Size))
 		}
 	}
+	drives.DropEmptyColumns()
 
 	volumes := newDetailTable("Volumes", "Device", "Mount point", "File system", "Size", "Used", "Free", "Used %")
 	if parts, err := disk.Partitions(false); err == nil {
 		sort.Slice(parts, func(i, j int) bool { return parts[i].Mountpoint < parts[j].Mountpoint })
 		for _, p := range parts {
 			if p.Fstype == "squashfs" { // snap packages and other images
+				continue
+			}
+			// macOS: pseudo file systems and the system volumes of the APFS
+			// container, which repeat the size of "/"
+			if p.Fstype == "devfs" || p.Fstype == "autofs" || strings.HasPrefix(p.Mountpoint, "/System/Volumes/") {
 				continue
 			}
 			u, err := disk.Usage(p.Mountpoint)
@@ -254,6 +305,7 @@ func getNetworkDetails() ([]*DetailTable, error) {
 		t.Add(iface.Name, extra.Description, status, iface.HardwareAddr.String(),
 			strings.Join(ipv4, ", "), strings.Join(ipv6, ", "), extra.Speed, extra.Driver)
 	}
+	t.DropEmptyColumns() // macOS has no speed and driver
 	return []*DetailTable{t}, nil
 }
 

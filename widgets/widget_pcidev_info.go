@@ -3,6 +3,7 @@ package widgets
 import (
 	"sort"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/ipoluianov/altsysinfo/system"
 	"github.com/ipoluianov/altsysinfo/texts"
@@ -69,8 +70,9 @@ func NewWidgetPciDevInfo() *WidgetPciDevInfo {
 
 	c.lvItems.SetRowCount(10)
 	c.lvItems.SetColumnCount(4)
-	c.lvItems.SetColumnWidth(0, 70)
-	c.lvItems.SetColumnWidth(1, 70)
+	// The IDs are 4 characters, the headers are longer: about 10 px per character
+	c.lvItems.SetColumnWidth(0, max(70, utf8.RuneCountInString(texts.T().ColVendorID)*10+16))
+	c.lvItems.SetColumnWidth(1, max(70, utf8.RuneCountInString(texts.T().ColDeviceID)*10+16))
 	c.lvItems.SetColumnWidth(2, 300)
 	c.lvItems.SetColumnWidth(3, 600)
 	c.lvItems.SetAllowScroll(false, true)

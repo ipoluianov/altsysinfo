@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
+	"runtime"
 	"strings"
 
 	"github.com/shirou/gopsutil/v4/cpu"
@@ -53,6 +54,38 @@ func addPlatformCPUDetails(t *DetailTable, _ []cpu.InfoStat) {
 			t.Add(c.name, formatBytes(size))
 		}
 	}
+}
+
+// platformCPUFeatures reads the ARM features from sysctl: golang.org/x/sys/cpu
+// sees only NEON and FP on macOS.
+func platformCPUFeatures() []string {
+	if runtime.GOARCH != "arm64" {
+		return nil
+	}
+	var result []string
+	for _, f := range []struct{ name, key string }{
+		{"NEON", "hw.optional.neon"},
+		{"FP", "hw.optional.floatingpoint"},
+		{"AES", "hw.optional.arm.FEAT_AES"},
+		{"PMULL", "hw.optional.arm.FEAT_PMULL"},
+		{"SHA1", "hw.optional.arm.FEAT_SHA1"},
+		{"SHA2", "hw.optional.arm.FEAT_SHA256"},
+		{"SHA3", "hw.optional.arm.FEAT_SHA3"},
+		{"SHA512", "hw.optional.arm.FEAT_SHA512"},
+		{"CRC32", "hw.optional.arm.FEAT_CRC32"},
+		{"LSE Atomics", "hw.optional.arm.FEAT_LSE"},
+		{"DotProd", "hw.optional.arm.FEAT_DotProd"},
+		{"FP16", "hw.optional.arm.FEAT_FP16"},
+		{"BF16", "hw.optional.arm.FEAT_BF16"},
+		{"I8MM", "hw.optional.arm.FEAT_I8MM"},
+		{"SME", "hw.optional.arm.FEAT_SME"},
+		{"SME2", "hw.optional.arm.FEAT_SME2"},
+	} {
+		if v, err := unix.SysctlUint32(f.key); err == nil && v != 0 {
+			result = append(result, f.name)
+		}
+	}
+	return result
 }
 
 func getGraphicsDetails() ([]*DetailTable, error) {

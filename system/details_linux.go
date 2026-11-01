@@ -134,6 +134,10 @@ func addPlatformCPUDetails(t *DetailTable, infos []cpu.InfoStat) {
 	}
 }
 
+func platformCPUFeatures() []string {
+	return nil // golang.org/x/sys/cpu is used
+}
+
 func getGraphicsDetails() ([]*DetailTable, error) {
 	gpus := newDetailTable("Graphics adapters", "Card", "Model", "ID", "Driver", "Video memory")
 	if list, err := getGPUs(); err == nil {

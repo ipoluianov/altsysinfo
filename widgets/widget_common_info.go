@@ -52,6 +52,13 @@ func (c *WidgetCommonInfo) LoadCommonInfo(info system.Info) {
 	}
 
 	for i, gpu := range info.GPUs {
-		c.AddRow(t.GPU(i+1), gpu.Model+" ("+gpu.Vendor+":"+gpu.Device+") - "+t.Driver+": "+gpu.Driver)
+		value := gpu.Model
+		if gpu.Vendor != "" || gpu.Device != "" { // no PCI IDs on Apple Silicon
+			value += " (" + gpu.Vendor + ":" + gpu.Device + ")"
+		}
+		if gpu.Driver != "" {
+			value += " - " + t.Driver + ": " + gpu.Driver
+		}
+		c.AddRow(t.GPU(i+1), value)
 	}
 }
