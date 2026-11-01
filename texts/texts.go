@@ -156,32 +156,36 @@ var Languages = []struct{ Tag, Name string }{
 	{"zh", "中文"},
 	{"ja", "日本語"},
 	{"ko", "한국어"},
+	{"nl", "Nederlands"},
+	{"sv", "Svenska"},
+	{"da", "Dansk"},
+	{"nb", "Norsk bokmål"},
+	{"fi", "Suomi"},
+	{"cs", "Čeština"},
+	{"sk", "Slovenčina"},
+	{"sl", "Slovenščina"},
+	{"hr", "Hrvatski"},
+	{"hu", "Magyar"},
+	{"ro", "Română"},
+	{"bg", "Български"},
+	{"el", "Ελληνικά"},
+	{"lt", "Lietuvių"},
+	{"lv", "Latviešu"},
+	{"et", "Eesti"},
+	{"tr", "Türkçe"},
+	{"id", "Bahasa Indonesia"},
+	{"vi", "Tiếng Việt"},
 }
 
 var catalog = i18n.NewCatalog(en, map[string]Strings{
 	"ru": ru, "pl": pl, "sr": sr, "de": de, "fr": fr, "es": es, "it": it, "pt": pt, "zh": zh, "ja": ja, "ko": ko,
+	"nl": nl, "sv": sv, "da": da, "nb": nb, "fi": fi, "cs": cs, "sk": sk, "sl": sl, "hr": hr, "hu": hu,
+	"ro": ro, "bg": bg, "el": el, "lt": lt, "lv": lv, "et": et, "tr": tr, "id": ind, "vi": vi,
 })
 
 // T returns the texts in the language of the application
 func T() *Strings {
 	return catalog.Get(ui.Language())
-}
-
-// The library translates its own buttons (OK, Cancel...) to Russian and Chinese only
-func init() {
-	for lang, s := range map[string]ui.UIStrings{
-		"pl": {OK: "OK", Cancel: "Anuluj", Yes: "Tak", No: "Nie"},
-		"sr": {OK: "У реду", Cancel: "Откажи", Yes: "Да", No: "Не"},
-		"de": {OK: "OK", Cancel: "Abbrechen", Yes: "Ja", No: "Nein"},
-		"fr": {OK: "OK", Cancel: "Annuler", Yes: "Oui", No: "Non"},
-		"es": {OK: "Aceptar", Cancel: "Cancelar", Yes: "Sí", No: "No"},
-		"it": {OK: "OK", Cancel: "Annulla", Yes: "Sì", No: "No"},
-		"pt": {OK: "OK", Cancel: "Cancelar", Yes: "Sim", No: "Não"},
-		"ja": {OK: "OK", Cancel: "キャンセル", Yes: "はい", No: "いいえ"},
-		"ko": {OK: "확인", Cancel: "취소", Yes: "예", No: "아니요"},
-	} {
-		ui.RegisterUIStrings(lang, s)
-	}
 }
 
 // SetLanguage switches the application to the language of the settings, "" - the system's
