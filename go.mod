@@ -5,7 +5,7 @@ go 1.27.1
 require (
 	github.com/StackExchange/wmi v1.2.1
 	github.com/go-pdf/fpdf v0.9.0
-	github.com/ipoluianov/nui v0.0.29
+	github.com/ipoluianov/nui v0.0.30
 	github.com/shirou/gopsutil/v4 v4.26.7
 	golang.org/x/sys v0.41.0
 )
